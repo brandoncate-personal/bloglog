@@ -2,7 +2,7 @@ import "./App.css";
 
 import Page from "./Page";
 
-import { HashRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { IPage } from "./service/provider/github";
