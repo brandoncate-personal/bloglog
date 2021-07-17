@@ -1,0 +1,11 @@
+name = "bloglog"
+type = 'webpack'
+account_id = 'e441fd9ecf1793f6a161e9047cd3afe6'
+routes = [
+  "bloglog.brandoncate95.workers.dev/*"
+]
+zone_id = ''
+usage_model = ''
+workers_dev = true
+target_type = "webpack"
+site = {bucket = "./build",entry-point = "workers-site"}
