@@ -2,33 +2,25 @@ import { Card } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { RepoProvider } from "../service/provider/database";
-import { IPage } from "../service/provider/github";
+import { IDocument } from "../service/provider/database";
 import { StyleMap } from "../types/style";
 
 function Home() {
-  const projectId = "test-1-300600";
-  const documentId = "5romvLJopx6yWr5J6MCb";
-
-  const [pages, setPages] = useState<IPage[]>([]);
+  const [pages, setPages] = useState<IDocument[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      const repoProvider = new RepoProvider(projectId);
+      const repoProvider = new RepoProvider();
 
-      const repos = await repoProvider.getRepos(documentId);
-
-      if (repos !== undefined) {
-        // const pageProvider = new PageProvider(repos);
-
-        repoProvider
-          .getPages()
-          .then((pages) => {
-            if (pages !== undefined) {
-              setPages(pages);
-            }
-          })
-          .catch((err) => console.log(err));
-      }
+      repoProvider
+        .listDocuments()
+        .then((pages) => {
+          if (pages !== undefined) {
+            setPages(pages);
+          }
+          console.log(pages)
+        })
+        .catch((err) => console.log(err));
     }
     fetchData();
   }, []);
@@ -55,7 +47,7 @@ function Home() {
   );
 }
 
-function getRepoSlug(page: IPage): string {
+function getRepoSlug(page: IDocument): string {
   const splitRepo = page.repo.split("/");
   const slug = `/github/${splitRepo[splitRepo.length - 2]}/${
     splitRepo[splitRepo.length - 1]

@@ -1,88 +1,37 @@
-import { IPage } from "./github";
-
-interface RepoResponse {
-  name: string;
-  fields: {
-    repos: {
-      arrayValue: {
-        values: {
-          stringValue: string;
-        }[];
-      };
-    };
-  };
-  createTime: string;
-  updateTime: string;
+export interface IDocument {
+  id: string;
+  repo: string;
+  branch: string;
+  path: string;
+  title: string;
 }
 
-interface PagesResponse {
-  documents: {
-    name: string;
-    fields: {
-      branch: {
-        stringValue: string;
-      };
-      title: {
-        stringValue: string;
-      };
-      repo: {
-        stringValue: string;
-      };
-      path: {
-        stringValue: string;
-      };
-    };
-    createTime: string;
-    updateTime: string;
-  }[];
+interface DocumentListResponse {
+  status: number;
+  message: string;
+  data: IDocument[];
 }
 
 export class RepoProvider {
-  serviceUrl = "https://firestore.googleapis.com/v1/projects";
+  serviceUrl =
+    "https://us-central1-test-1-300600.cloudfunctions.net/bloglog-database-dev-documentList";
 
-  private projectId: string;
-
-  constructor(projectId: string) {
-    this.projectId = projectId;
-  }
-
-  getRepos(documentId: string): Promise<void | string[]> {
+  listDocuments(): Promise<void | IDocument[]> {
     var requestOptions: RequestInit = {
       method: "GET",
       redirect: "follow",
     };
 
-    return fetch(
-      `${this.serviceUrl}/${this.projectId}/databases/(default)/documents/repos/${documentId}`,
-      requestOptions
-    )
+    return fetch(`${this.serviceUrl}`, requestOptions)
       .then((response) => response.json())
-      .then((json: RepoResponse) => json.fields.repos.arrayValue.values)
-      .then((values) => values.flatMap((value) => value.stringValue))
-      .catch((err) => console.log(err));
-  }
-
-  getPages(): Promise<void | IPage[]> {
-    var requestOptions: RequestInit = {
-      method: "GET",
-      redirect: "follow",
-    };
-
-    return fetch(
-      `${this.serviceUrl}/${this.projectId}/databases/(default)/documents/pages`,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((json: PagesResponse) => {
-        return json.documents.map((doc) => {
-          const page: IPage = {
-            branch: doc.fields.branch.stringValue,
-            title: doc.fields.title.stringValue,
-            repo: doc.fields.repo.stringValue,
-            path: doc.fields.path.stringValue,
-          };
-          return page;
-        });
+      .then((json: DocumentListResponse) => {
+        console.log(json);
+        switch (json.status) {
+          case 200:
+            return json.data;
+          default:
+            throw new Error(json.message);
+        }
       });
   }
 }
